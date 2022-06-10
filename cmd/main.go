@@ -17,6 +17,8 @@ func main(){
 	userGroup := engine.Group("/user")
 	{
 		userGroup.POST("/regist/sendactivation",api.SendActivationCode)
+		userGroup.POST("/regist/active",api.VerifyActivationCode)
+		userGroup.POST("/login",api.Login)
 	}
 
 

@@ -2,11 +2,13 @@ package api
 
 import (
 	"ChineseChess/model"
-	service "ChineseChess/service/user"
+	service "ChineseChess/service"
+	"fmt"
 	"github.com/gin-gonic/gin"
-
 	"log"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 //该go文件共有两个接口，一个接口用来发送激活码，一个接口用来验证激活码
@@ -86,14 +88,58 @@ func SendActivationCode(c *gin.Context){
 
 func VerifyActivationCode(c *gin.Context){
 	//获取用户发送信息
-
-	//从数据库中提取信息
-
-
+	var u model.User
+	err := c.ShouldBind(&u)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusOK,gin.H{
+			"message":"注册出错，请联系管理员",
+		})
+		return
+	}
+	//从数据库中提取激活码
+	um := service.ObtainCode(u.Name)
+	code := um.ActivationCode
+	//如果激活码不存在或失效，返回信息
+	if (code == "" || (um.CreateTime.UnixNano()-time.Now().UnixNano())<0) {
+		c.JSON(http.StatusOK,gin.H{
+			"message":"邮箱激活码不存在或失效，请获取激活码",
+		})
+		return
+	}
+	//验证激活码格式是否正确
+	if len(u.ActivationCode) != 4 {
+		c.JSON(http.StatusOK,gin.H{
+			"message":"激活码格式不对",
+		})
+		return
+	}
 	//判断激活码是否正确
-
-
+	if code != u.ActivationCode {
+		c.JSON(http.StatusOK,gin.H{
+			"message":"激活码不正确，请重新输入",
+		})
+		return
+	}
 	//激活码正确，更新用户表
-
+	//盐值位激活码发送的时间戳和现在时间戳的差值
+	um.Salt = strconv.Itoa(int(um.CreateTime.UnixNano()-time.Now().Unix()))
+	um.CreateTime = time.Now()
+	//激活码字段变为0
+	um.ActivationCode = "0"
+	//密码加盐,密码加上盐值
+	um.Password = service.EncryPs(um.Password+um.Salt)
+	//将数据传入更新
+	fmt.Println("um",um)
+	err = service.UpdateNewUser(um)
+	if err != nil {
+		c.JSON(http.StatusOK,gin.H{
+			"message":"出现错误，请联系管理员",
+		})
+		return
+	}
+	c.JSON(http.StatusOK,gin.H{
+		"message":"激活成功",
+	})
 
 }

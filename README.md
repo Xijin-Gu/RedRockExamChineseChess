@@ -7,6 +7,12 @@ email
 sendactivation
 createtime
 salt
+房间表
+id
+create_name
+participate_name
+create_state
+participate_state
 # 基本接口
 
 ## 用户相关
@@ -15,11 +21,11 @@ salt
 
 - `application/x-www.form-urlencoded`
 
-- 用户注册界面
+- 用户注册接口
 
 | 请求参数 | 类型 | 说明       |
 | -------- | ---- | ---------- |
-| Username | 必选 | 注册用户名 |
+| name | 必选 | 注册用户名 |
 |Password|必选|注册用户密码|
 |Email|必选|用户注册邮箱|
 
@@ -43,10 +49,11 @@ salt
 
 | 请求参数 | 类型 | 说明       |
 | -------- | ---- | ---------- |
-| UserName | 必选 | 注册用户名 |
+| Name | 必选 | 注册用户名 |
 |ActivationCode|必选|激活码|
 
-流程，通过用户名读取数据库信息
+流程：
+通过用户名读取数据库信息
 和激活码进行匹配。
 激活码过期或者为空，返回激活码不存在或已经失效
 如果激活码正确，激活码字段变为0，表示用户已激活。
@@ -57,19 +64,58 @@ salt
 
 ### `user/login`
 
+- `application/x-www.form-urlencoded`
+
+- 登录接口
+
+|请求参数|类型|说明|
+|--- |--- |---|
+|Name|必选|用户名|
+|Password|必选|用户密码|
+
+流程：
+用户检验用户输入参数是否合法，Name字段不能大于15且不为0，Password字段长度大于6
+通过用户名读取数据库，判断是否拥有该用户
+如果用户存在，判断ActivatiionCode字段是否为”0“，不为”0“，则账号未激活。
+用户存在且已激活，通过盐值将用户输入密码与数据匹配。
+正确返回token，带有用户信息。有效时间为48个小时
+
+## 房间相关
+
+### `/house/create`	`POST`
+
+- `application/x-www.form-urlencoded`
+
+- 创建房间界面
+
+|请求参数|类型|说明|
+|---|---|---|
+|CreateName|必选|房主名|
 
 
 
 
-### `user/login/email`
 
 
 
 
+### `/house/join` `POST`
+
+- `application/x-www.form-urlencoded`
+
+- 加入房间界面
 
 
 
-### `user/login/forget`
+
+### `/house/:id` `GET`
+
+- id为`:id`的房间页
+
+
+### 游戏相关
+
+
 
 
 

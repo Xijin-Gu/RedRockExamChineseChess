@@ -3,8 +3,9 @@ package service
 import (
 	"ChineseChess/dao"
 	"ChineseChess/model"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"math/rand"
 	"net/smtp"
@@ -89,5 +90,54 @@ func SaveNewUser(u model.User)bool{
 		return false
 	}
 	return true
-
 }
+
+//获取激活码
+func ObtainCode (n string)model.User{
+	//连接到数据库
+	db := dao.Link()
+	//通过name查找数据库中信息
+	u :=dao.NameQuery(db,n)
+	return u
+}
+
+
+//更新激活后的用户信息，并判断是否过期
+func UpdateNewUser(u model.User)error{
+	//连接数据库
+	db := dao.Link()
+	//更新数据
+	err := dao.UpdateNewUser(db,u)
+	return err
+}
+
+//使用md5加密用户密码，密码+盐值
+func EncryPs(ps string)string{
+	h := md5.New()
+	h.Write([]byte(ps))
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func JudgePw(pw,salt,in string)bool{
+	h := md5.New()
+	h.Write([]byte(in+salt))
+	strm := hex.EncodeToString(h.Sum(nil))
+	if strm == pw {
+		return true
+	}
+	return false
+}
+
+
+//判断用户是否存在，读取数据库中信息
+func JudgeUser(n string)model.User{
+	//连接到数据库
+	db := dao.Link()
+	//通过用户名，读取信息
+	u := dao.NameQuery(db,n)
+	return u
+}
+
+
+
+
