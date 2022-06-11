@@ -23,3 +23,11 @@ func UpdateHouse(db *gorm.DB,house model.House)error{
 	err := db.Model(&model.House{}).Where(&model.House{ID: house.ID}).Update(&house).Error
 	return err
 }
+
+//第一次存储游戏表
+func SaveNewGame(db *gorm.DB,game model.Game)model.Game{
+	db.Model(&model.Game{}).Create(&game)
+	var gr model.Game
+	db.Model(&model.Game{}).Where(&game).First(&gr)
+	return gr
+}
