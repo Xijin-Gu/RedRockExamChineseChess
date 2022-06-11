@@ -12,19 +12,20 @@ import (
 )
 
 //定义Jwt生效时间和secret
-var JWT_Effective_Time = time.Hour*48
+var JwtEffectiveTime = time.Hour*48
 var Secret =[]byte("RedRockChineseChess")
 
 //jwt生成
 func GenerateToken(name string)(string,error){
 	//创建声明
 	c := model.Claims{
-		name,
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(JWT_Effective_Time).Unix(),
+		Name: name,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(JwtEffectiveTime).Unix(),
 			Issuer: "RedRockChineseChess-project",
 		},
 	}
+	fmt.Println("claims",c)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,c)
 	return token.SignedString(Secret)
@@ -67,9 +68,9 @@ func VerifyJWT()func(c *gin.Context){
 		}
 
 		//提取token信息段
-		JWT_information := strings.SplitN(authorization," ",2)
+		JwtInformation := strings.SplitN(authorization," ",2)
 		//验证auth信息段是否合法
-		if !(len(JWT_information) == 2 && JWT_information[0] == "Bearer") {
+		if !(len(JwtInformation) == 2 && JwtInformation[0] == "Bearer") {
 			c.JSON(http.StatusOK,gin.H{
 				"code" : 2004,
 				"message" : "Authorazition格式错误",
@@ -78,7 +79,7 @@ func VerifyJWT()func(c *gin.Context){
 			return
 		}
 		//验证token是否有效
-		claim,err := ParseJWT(JWT_information[1])
+		claim,err := ParseJWT(JwtInformation[1])
 		if err != nil {
 			c.JSON(http.StatusOK,gin.H{
 				"code" : 2005,

@@ -90,27 +90,33 @@ participate_state
 
 |请求参数|类型|说明|
 |---|---|---|
-|CreateName|必选|房主名|
+|token|必选|令牌|
 
+流程：
+后端提取jwt信息。
+如果jwt有效，生成一个房间
+将房间ID返回
 
-
-
-
-
-
-
-### `/house/join` `POST`
-
-- `application/x-www.form-urlencoded`
-
-- 加入房间界面
 
 
 
 
 ### `/house/:id` `GET`
 
-- id为`:id`的房间页
+- 加入id为`:id`的房间页
+
+|请求参数|类型|说明|
+|---|---|---|
+|token|必选|令牌|
+|state|可选|用户准备情况|
+
+
+流程：
+后端提取，jwt信息
+如果jwt有效，后端通过id查询房间信息。
+如果房间存在，提示已加入房间，并更新房间信息。
+如果房间信息中，create_state和participate_state字段都为1，则创建一个游戏界面
+返回游戏id，并初始化游戏
 
 
 ### 游戏相关

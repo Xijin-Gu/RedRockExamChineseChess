@@ -1,7 +1,7 @@
 package main
 
 import (
-	api "ChineseChess/api/user"
+	"ChineseChess/api"
 	"ChineseChess/service"
 	"github.com/gin-gonic/gin"
 )
@@ -21,6 +21,13 @@ func main(){
 		userGroup.POST("/login",api.Login)
 	}
 
+
+	//定义房间组
+	userGroupH := engine.Group("/house")
+	{
+		userGroupH.POST("/create",service.VerifyJWT(),api.CreateHouse)
+		userGroupH.GET("/:id",service.VerifyJWT(),api.JoinHouse)
+	}
 
 	//启动
 	engine.Run(":8090")
