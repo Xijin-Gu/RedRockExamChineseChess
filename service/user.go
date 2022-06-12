@@ -29,11 +29,13 @@ func JudgeEmail(email string)bool{
 func JudgeUsername(name string)bool{
 	//连接数据库
 	db := dao.Link()
+
 	//从数据库中提取数据
 	u := dao.NameQuery(db,name)
 	if u.ID == 0 {
 		return true
 	}
+	defer db.Close()
 	return false
 
 }
@@ -54,7 +56,7 @@ func SendActivationCode(email string)string{
 	receiver := []string{email}
 	//设置发送信息，发件人，标题，内容
 	//发件人
-	senderName := "redholiday-project"
+	senderName := "redRockChineseChess-project"
 	//标题
 	title := "您的激活码"
 	//内容，随机四位数的激活码，利用时间戳和rand随机数
@@ -83,8 +85,10 @@ func SaveNewUser(u model.User)bool{
 	u.CreateTime = time.Now().Add(10*time.Minute)
 	//连接数据库
 	db := dao.Link()
+
 	//将数据存入数据库中
 	err := dao.SaveNewUser(db,u)
+	defer db.Close()
 	if err != nil {
 		log.Println(err)
 		return false
@@ -96,8 +100,10 @@ func SaveNewUser(u model.User)bool{
 func ObtainCode (n string)model.User{
 	//连接到数据库
 	db := dao.Link()
+
 	//通过name查找数据库中信息
 	u :=dao.NameQuery(db,n)
+	defer db.Close()
 	return u
 }
 
@@ -106,8 +112,10 @@ func ObtainCode (n string)model.User{
 func UpdateNewUser(u model.User)error{
 	//连接数据库
 	db := dao.Link()
+
 	//更新数据
 	err := dao.UpdateNewUser(db,u)
+	defer db.Close()
 	return err
 }
 
@@ -133,8 +141,10 @@ func JudgePw(pw,salt,in string)bool{
 func JudgeUser(n string)model.User{
 	//连接到数据库
 	db := dao.Link()
+
 	//通过用户名，读取信息
 	u := dao.NameQuery(db,n)
+	defer db.Close()
 	return u
 }
 

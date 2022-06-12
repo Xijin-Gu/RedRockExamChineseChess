@@ -31,7 +31,7 @@ func main(){
 
 
 	//定义游戏界面,协议升级为websocket
-	engine.POST("/game/:id",service.VerifyJWT(),api.ChessGame)		//游戏界面，供用户游玩。
+	engine.GET("/game/:id",api.ChessGame)		//游戏界面，供用户游玩。
 
 	//启动
 	engine.Run(":8090")

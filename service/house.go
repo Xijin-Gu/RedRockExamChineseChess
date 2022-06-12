@@ -12,6 +12,7 @@ func CreateHouse(h model.House)int{
 	db := dao.Link()
 	//创建一个新房间词条
 	id := dao.CreateHouse(db,h.CreateName)
+	defer db.Close()
 	return id
 }
 
@@ -26,6 +27,7 @@ func JudgeHouse(id int)bool{
 			return false
 		}
 	}
+	defer db.Close()
 	return true
 }
 
@@ -35,11 +37,14 @@ func JudgeHouse(id int)bool{
 func JudgeHouseOwner(n string,id int)bool{
 	//连接数据库
 	db := dao.Link()
+
 	//查询数据库
 	_,house := dao.QueryHouse(db,id)
+	defer db.Close()
 	if n == house.CreateName {
 		return true
 	}
+
 	return false
 }
 
@@ -47,12 +52,14 @@ func JudgeHouseOwner(n string,id int)bool{
 func SaveParticipate(n string,id int)error{
 	//连接数据库
 	db := dao.Link()
+
 	//查询数据库
 	_,house := dao.QueryHouse(db,id)
 	//更新信息
 	house.ParticipateName = n
 	//更新数据库
 	err := dao.UpdateHouse(db,house)
+	defer db.Close()
 	return err
 
 }
@@ -61,6 +68,7 @@ func SaveParticipate(n string,id int)error{
 func SaveState(st string,b bool,id int)error{
 	//连接数据库
 	db := dao.Link()
+
 	//查询数据库
 	_,house := dao.QueryHouse(db,id)
 	//更新信息
@@ -71,6 +79,7 @@ func SaveState(st string,b bool,id int)error{
 	}
 	//更新数据库
 	err := dao.UpdateHouse(db,house)
+	db.Close()
 	return err
 }
 
@@ -78,8 +87,10 @@ func SaveState(st string,b bool,id int)error{
 func JudgeState(id int)bool{
 	//连接数据库
 	db := dao.Link()
+
 	//查询数据库
 	_,house := dao.QueryHouse(db,id)
+	db.Close()
 	//判断状态信息
 	if (house.CreateState == "1" && house.ParticipateState == "1") {
 		return true
@@ -93,6 +104,7 @@ func JudgeState(id int)bool{
 func InitGameAndPiece(id int)int{
 	//连接数据库
 	db := dao.Link()
+
 	//通过id读取House表信息
 	_,house := dao.QueryHouse(db,id)
 	//开始初始化信息
@@ -104,5 +116,6 @@ func InitGameAndPiece(id int)int{
 	gameData.Winlose = "无"
 	gameData.Checkerboard = "151413121112131415\n000000000000000000\n001600000000001600\n170017001700170017\n000000000000000000\n000000000000000000\n270027002700270027\n002600000000002600\n000000000000000000\n252423222122232425"
 	gameDataMysql := dao.SaveNewGame(db,gameData)
+	defer db.Close()
 	return gameDataMysql.ID
 }

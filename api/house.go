@@ -91,7 +91,7 @@ func JoinHouse(c *gin.Context){
 	//创建一个游戏
 	gameID := service.InitGameAndPiece(houseID)
 	c.JSON(http.StatusOK,gin.H{
-		"message":gameID,
+		"message":"游戏id为:"+strconv.Itoa(gameID),
 	})
 
 }

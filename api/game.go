@@ -43,8 +43,8 @@ func ChessGame(c *gin.Context){
 		var checkerboard [10][9]string
 		checkerboard = service.ParseCheckboard(gameData.Checkerboard)
 		//走棋后
-		gameUpdate := service.MoveChess(start,end,checkerboard,gameData)
 
+		gameUpdate := service.MoveChess(start,end,checkerboard,gameData)
 
 				a := service.UpdateChessData(gameUpdate)
 				//把a塞进通道进行播报

@@ -3,6 +3,7 @@ package service
 import (
 	"ChineseChess/dao"
 	"ChineseChess/model"
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -24,15 +25,14 @@ func ParseCheckboard(str string)[10][9]string{
 	var checkboards [10][18]string
 	var checkboard [10][9]string
 	a := strings.Split(str,"\n")
-	for i,v := range a{
-		for i1,v1 := range v{
+	for i,v := range a {
+		for i1,v1 := range v {
 			checkboards[i][i1] = string(v1)
 		}
 	}
 	for i:=0;i<10;i++{
-		for j:=0;j<18;j=j+2{
-			jc := j/2
-			checkboard[i][jc] = checkboards[i][j]+checkboards[i][j+1]
+		for j:=0;j<9;j++{
+			checkboard[i][j] = checkboards[i][2*j]+checkboards[i][2*j+1]
 		}
 	}
 	return checkboard
@@ -41,11 +41,14 @@ func ParseCheckboard(str string)[10][9]string{
 func MoveChess(start,end string,checkboard [10][9]string,gameData model.Game)(model.Game){
 	startCode,_ := strconv.Atoi(start)
 	endCode,_ := strconv.Atoi(end)
-	si := startCode%10
-	sj := startCode-si*10
-	ei := endCode%10
-	ej := endCode-ei
+	si := startCode/10-1
+	sj := startCode%10-1
+	ei := endCode/10-1
+	ej := endCode%10-1
 	//确定棋子类型
+	fmt.Println(startCode)
+	fmt.Println(startCode%10)
+	fmt.Println(si," ",sj," ",ei," ",ej)
 	pieceT := checkboard[si][sj]
 	if pieceT == "00" {
 		return gameData
@@ -126,10 +129,10 @@ func MoveChess(start,end string,checkboard [10][9]string,gameData model.Game)(mo
 
 }
 func KingMove(start,end int,code string)bool{
-	si := start%10
-	sj := start-si*10
-	ei := end%10
-	ej := end-ei
+	si := start/10-1
+	sj := start%10-1
+	ei := end/10-1
+	ej := end%10-1
 	//- 满足3<j<7,
 	//- 编码为11，满足1<=i<=3
 	//- 编码为21，满足8<=i<=10
@@ -154,10 +157,10 @@ func KingMove(start,end int,code string)bool{
 
 }
 func GuardMove(start,end int,code string)bool{
-	si := start%10
-	sj := start-si*10
-	ei := end%10
-	ej := end-ei
+	si := start/10-1
+	sj := start%10-1
+	ei := end/10-1
+	ej := end%10-1
 	//- 满足3<i<7,
 	//	- 编码为12，满足1<=i<=3
 	//- 编码为22，满足8<=i<=10
@@ -182,10 +185,10 @@ func GuardMove(start,end int,code string)bool{
 }
 
 func BishopMove(start,end int,code string,checkboard [10][9]string)bool{
-	si := start%10
-	sj := start-si*10
-	ei := end%10
-	ej := end-ei
+	si := start/10-1
+	sj := start%10-1
+	ei := end/10-1
+	ej := end%10-1
 	//- 编码为13，满足1<=i<=5
 	//- 编码为23，满足6<=i<=10
 	//- 满足|si*10+sj-ei*10-ej|==22
@@ -211,10 +214,8 @@ func BishopMove(start,end int,code string,checkboard [10][9]string)bool{
 }
 
 func KnightMove(start,end int,checkboard [10][9]string)bool{
-	si := start%10
-	sj := start-si*10
-	ei := end%10
-	ej := end-ei
+	si := start/10-1
+	sj := start%10-1
 	//- |end-start|== 12 || 21
 	//- 马腿为，|end-start|== 12,(si,sj+1)不能由棋子；|end-start|== 21，（si+1,sj)处不能由棋子。
 	if !(math.Abs(float64(start-end)) == 12 || math.Abs(float64(start-end)) == 21) {
@@ -234,10 +235,10 @@ func KnightMove(start,end int,checkboard [10][9]string)bool{
 }
 
 func RookAndCannonMove(start,end int,checkboard [10][9]string)bool{
-	si := start%10
-	sj := start-si*10
-	ei := end%10
-	ej := end-ei
+	si := start/10-1
+	sj := start%10-1
+	ei := end/10-1
+	ej := end%10-1
 	//- i,j只有一个能动。
 	//- 开始结束之间不能有棋子
 	if (si != ei && sj != ej){
@@ -263,10 +264,10 @@ func RookAndCannonMove(start,end int,checkboard [10][9]string)bool{
 
 
 func PawnMove(start,end int,code string)bool{
-	si := start%10
-	sj := start-si*10
-	ei := end%10
-	ej := end-ei
+	si := start/10-1
+	sj := start%10-1
+	ei := end/10-1
+	ej := end%10-1
 	//- ei>=si
 	//
 	//- 编码为17，i<=5,sj=ej
@@ -295,14 +296,16 @@ func PawnMove(start,end int,code string)bool{
 }
 
 func CannonEat(start,end int,checkboard [10][9]string)bool{
-	si := start%10
-	sj := start-si*10
-	ei := end%10
-	ej := end-ei
+	si := start/10-1
+	sj := start%10-1
+	ei := end/10-1
+	ej := end%10-1
 	//- ei,ej处编码和si,sj处不同
 	//- 遍历中间的值，存在且仅存在一个非00值
-	pieceTs := strconv.Atoi(checkboard[si][sj])%10
-	pieceTe := strconv.Atoi(checkboard[ei][ej])%10
+	pieceTs,_ := strconv.Atoi(checkboard[si][sj])
+	pieceTe,_ := strconv.Atoi(checkboard[ei][ej])
+	pieceTs = pieceTs%10
+	pieceTe = pieceTe%10
 	if pieceTs == pieceTe || pieceTe == 0 {
 		return false
 	}
@@ -325,8 +328,10 @@ func CannonEat(start,end int,checkboard [10][9]string)bool{
 
 func UpdateChessData(game model.Game)string{
 	db := dao.Link()
+
 	dao.UpdateGameData(db,game)
 	gameData := dao.QueryGameDataByID(db,game.ID)
+	defer db.Close()
 	return gameData.Checkerboard
 }
 
