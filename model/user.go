@@ -1,3 +1,9 @@
+/**
+* @Author: gxj
+* @Data: 2022/7/17-3:25
+* @DESC: Contains user-related structures,包含了用户相关的结构体
+**/
+
 package model
 
 import (
@@ -7,16 +13,16 @@ import (
 
 
 type User struct {
-	ID int `gorm:"primary_key"`
-	Name string `gorm:"unique"`
-	Password string
-	Email string
-	ActivationCode string
-	CreateTime time.Time
-	Salt string
+	ID int `gorm:"primary_key"`	//用户ID
+	Name string `gorm:"unique"`	//用户名
+	Password string				//用户密码，加盐后存储
+	Email string				//用户邮箱
+	ActivationCode string		//用户验证码，激活后为0
+	CreateTime time.Time		//创建时间
+	Salt string					//用户密码的盐值
 }
 
-//JWT相关结构体
+//Claims JWT相关结构体
 //声明claims结构体,自定义字段添加用户名
 type Claims struct {
 	Name string `json:"name"`

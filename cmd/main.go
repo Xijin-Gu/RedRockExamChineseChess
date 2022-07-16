@@ -1,3 +1,8 @@
+/**
+* @Author: gxj
+* @Data: 2022/7/17-3:10
+* @DESC: Define the interface path，定义接口路径
+**/
 package main
 
 import (
@@ -16,8 +21,8 @@ func main(){
 	//定义用户组
 	userGroup := engine.Group("/user")
 	{
-		userGroup.POST("/regist/sendactivation",api.SendActivationCode)	//注册界面，会发送邮箱激活码，需要用户使用用户名和激活码进行激活
-		userGroup.POST("/regist/active",api.VerifyActivationCode)		//激活界面，用户提供用户名和激活码。进行账号激活
+		userGroup.POST("/register/deactivation",api.SendActivationCode)	//注册界面，会发送邮箱激活码，需要用户使用用户名和激活码进行激活
+		userGroup.POST("/register/active",api.VerifyActivationCode)		//激活界面，用户提供用户名和激活码。进行账号激活
 		userGroup.POST("/login",api.Login)								//登录接口，用户进行登录
 	}
 

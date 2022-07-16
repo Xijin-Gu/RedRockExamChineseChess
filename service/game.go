@@ -1,3 +1,9 @@
+/**
+* @Author: gxj
+* @Data: 2022/7/17-3:19
+* @DESC: checkerboards
+**/
+
 package service
 
 import (
@@ -9,36 +15,38 @@ import (
 	"strings"
 )
 
+//JudgeGameUser 判断游戏参与者
 func JudgeGameUser(userName string,gameID int)(bool,model.Game){
 	db := dao.Link()
 	defer db.Close()
 	gameData := dao.QueryGameDataByID(db,gameID)
-	if (userName == gameData.Mover || userName == gameData.Waiter) {
+	if userName == gameData.Mover || userName == gameData.Waiter {
 		return true,gameData
 	}
 	return false,gameData
 }
 
 
-
-func ParseCheckboard(str string)[10][9]string{
-	var checkboards [10][18]string
-	var checkboard [10][9]string
+//ParseCheckerboard 解析游戏棋盘
+func ParseCheckerboard(str string)[10][9]string{
+	var checkerboards [10][18]string
+	var checkerboard [10][9]string
 	a := strings.Split(str,"\n")
 	for i,v := range a {
 		for i1,v1 := range v {
-			checkboards[i][i1] = string(v1)
+			checkerboards[i][i1] = string(v1)
 		}
 	}
 	for i:=0;i<10;i++{
 		for j:=0;j<9;j++{
-			checkboard[i][j] = checkboards[i][2*j]+checkboards[i][2*j+1]
+			checkerboard[i][j] = checkerboards[i][2*j]+ checkerboards[i][2*j+1]
 		}
 	}
-	return checkboard
+	return checkerboard
 }
 
-func MoveChess(start,end string,checkboard [10][9]string,gameData model.Game)(model.Game){
+//MoveChess 棋子移动逻辑判断
+func MoveChess(start,end string, checkerboard [10][9]string,gameData model.Game) model.Game {
 	startCode,_ := strconv.Atoi(start)
 	endCode,_ := strconv.Atoi(end)
 	si := startCode/10-1
@@ -49,7 +57,7 @@ func MoveChess(start,end string,checkboard [10][9]string,gameData model.Game)(mo
 	fmt.Println(startCode)
 	fmt.Println(startCode%10)
 	fmt.Println(si," ",sj," ",ei," ",ej)
-	pieceT := checkboard[si][sj]
+	pieceT := checkerboard[si][sj]
 	if pieceT == "00" {
 		return gameData
 	}
@@ -69,28 +77,28 @@ func MoveChess(start,end string,checkboard [10][9]string,gameData model.Game)(mo
 		boM = GuardMove(startCode,endCode,"22",)
 		break
 	case "13":
-		boM = BishopMove(startCode,endCode,"13",checkboard)
+		boM = BishopMove(startCode,endCode,"13", checkerboard)
 		break
 	case "23":
-		boM = BishopMove(startCode,endCode,"23",checkboard)
+		boM = BishopMove(startCode,endCode,"23", checkerboard)
 		break
 	case "14":
-		boM = KnightMove(startCode,endCode,checkboard)
+		boM = KnightMove(startCode,endCode, checkerboard)
 		break
 	case "24":
-		boM = KnightMove(startCode,endCode,checkboard)
+		boM = KnightMove(startCode,endCode, checkerboard)
 		break
 	case "15":
-		boM = RookAndCannonMove(startCode,endCode,checkboard)
+		boM = RookAndCannonMove(startCode,endCode, checkerboard)
 		break
 	case "25":
-		boM = RookAndCannonMove(startCode,endCode,checkboard)
+		boM = RookAndCannonMove(startCode,endCode, checkerboard)
 		break
 	case "16":
-		boM = RookAndCannonMove(startCode,endCode,checkboard)
+		boM = RookAndCannonMove(startCode,endCode, checkerboard)
 		break
 	case "26":
-		boM = RookAndCannonMove(startCode,endCode,checkboard)
+		boM = RookAndCannonMove(startCode,endCode, checkerboard)
 		break
 	case "17":
 		boM = PawnMove(startCode,endCode,"17")
@@ -103,31 +111,32 @@ func MoveChess(start,end string,checkboard [10][9]string,gameData model.Game)(mo
 		return gameData
 	}
 	//验证是否已有棋子
-	piecejs,_ := strconv.Atoi(pieceT)
-	pieceje,_ := strconv.Atoi(checkboard[ei][ej])
-	if piecejs%10 == pieceje%10 {
+	pieces,_ := strconv.Atoi(pieceT)
+	piece,_ := strconv.Atoi(checkerboard[ei][ej])
+	if pieces%10 == piece%10 {
 		return gameData
 	}
 	//验证吃子
 	if pieceT == "16" || pieceT == "26" {
-		boM = CannonEat(startCode,endCode,checkboard)
+		boM = CannonEat(startCode,endCode, checkerboard)
 		if !boM {
 			return gameData
 		}
 	}
-	checkboard[ei][ej] = checkboard[si][sj]
-	checkboard[si][sj] = "00"
-	var checkboardStr string
+	checkerboard[ei][ej] = checkerboard[si][sj]
+	checkerboard[si][sj] = "00"
+	var checkerboardStr string
 	for i:=0;i<10;i++{
 		for j:=0;j<9;j++{
-			checkboardStr = checkboardStr+checkboard[i][j]
+			checkerboardStr = checkerboardStr + checkerboard[i][j]
 		}
-		checkboardStr = checkboardStr + "\n"
+		checkerboardStr = checkerboardStr + "\n"
 	}
-	gameData.Checkerboard = checkboardStr
+	gameData.Checkerboard = checkerboardStr
 	return gameData
 
 }
+//KingMove 将帅是否移动
 func KingMove(start,end int,code string)bool{
 	si := start/10-1
 	sj := start%10-1
@@ -156,6 +165,7 @@ func KingMove(start,end int,code string)bool{
 
 
 }
+//GuardMove 士是否移动
 func GuardMove(start,end int,code string)bool{
 	si := start/10-1
 	sj := start%10-1
@@ -184,6 +194,7 @@ func GuardMove(start,end int,code string)bool{
 
 }
 
+//BishopMove 象是否移动
 func BishopMove(start,end int,code string,checkboard [10][9]string)bool{
 	si := start/10-1
 	sj := start%10-1
@@ -212,8 +223,8 @@ func BishopMove(start,end int,code string,checkboard [10][9]string)bool{
 
 
 }
-
-func KnightMove(start,end int,checkboard [10][9]string)bool{
+//KnightMove 马是否移动
+func KnightMove(start,end int, checkerboard [10][9]string)bool{
 	si := start/10-1
 	sj := start%10-1
 	//- |end-start|== 12 || 21
@@ -222,18 +233,18 @@ func KnightMove(start,end int,checkboard [10][9]string)bool{
 		return false
 	}
 	if math.Abs(float64(start-end)) == 12 {
-		if checkboard[si][sj+1] != "00" {
+		if checkerboard[si][sj+1] != "00" {
 			return false
 		}
 	} else {
-		if checkboard[si+1][sj] != "00" {
+		if checkerboard[si+1][sj] != "00" {
 			return false
 		}
 	}
 	return true
 
 }
-
+//RookAndCannonMove 车和炮是否移动
 func RookAndCannonMove(start,end int,checkboard [10][9]string)bool{
 	si := start/10-1
 	sj := start%10-1
@@ -241,10 +252,10 @@ func RookAndCannonMove(start,end int,checkboard [10][9]string)bool{
 	ej := end%10-1
 	//- i,j只有一个能动。
 	//- 开始结束之间不能有棋子
-	if (si != ei && sj != ej){
+	if si != ei && sj != ej {
 		return false
 	}
-	if (si == ei){
+	if si == ei {
 		for j:=sj+1;j<ej;j++{
 			if checkboard[ei][j] != "00"{
 				return false
@@ -262,7 +273,7 @@ func RookAndCannonMove(start,end int,checkboard [10][9]string)bool{
 }
 
 
-
+//PawnMove 兵是否移动
 func PawnMove(start,end int,code string)bool{
 	si := start/10-1
 	sj := start%10-1
@@ -295,6 +306,7 @@ func PawnMove(start,end int,code string)bool{
 	return true
 }
 
+//CannonEat 吃子
 func CannonEat(start,end int,checkboard [10][9]string)bool{
 	si := start/10-1
 	sj := start%10-1
@@ -325,7 +337,7 @@ func CannonEat(start,end int,checkboard [10][9]string)bool{
 }
 
 
-
+//UpdateChessData 更新游戏信息
 func UpdateChessData(game model.Game)string{
 	db := dao.Link()
 

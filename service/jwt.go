@@ -1,3 +1,9 @@
+/**
+* @Author: gxj
+* @Data: 2022/7/17-3:20
+* @DESC: Contains jwt-related business logic,包含了jwt相关的业务逻辑
+**/
+
 package service
 
 import (
@@ -11,11 +17,14 @@ import (
 "time"
 )
 
-//定义Jwt生效时间和secret
-var JwtEffectiveTime = time.Hour*48
-var Secret =[]byte("RedRockChineseChess")
 
-//jwt生成
+var (
+	JwtEffectiveTime = time.Hour*48
+	Secret =[]byte("RedRockChineseChess")			//定义Jwt生效时间和secret
+)
+
+
+//GenerateToken jwt生成
 func GenerateToken(name string)(string,error){
 	//创建声明
 	c := model.Claims{
@@ -33,10 +42,10 @@ func GenerateToken(name string)(string,error){
 }
 
 
-//JWT解析
-func ParseJWT(tokenstring string)(*model.Claims,error){
+//ParseJWT JWT解析
+func ParseJWT(TokenString string)(*model.Claims,error){
 	//解析token
-	token,err := jwt.ParseWithClaims(tokenstring,&model.Claims{}, func(token *jwt.Token) (interface{}, error) {
+	token,err := jwt.ParseWithClaims(TokenString,&model.Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return Secret,nil
 	})
 	//处理错误
@@ -51,7 +60,7 @@ func ParseJWT(tokenstring string)(*model.Claims,error){
 }
 
 
-//JWT认证
+//VerifyJWT JWT认证
 func VerifyJWT()func(c *gin.Context){
 	return func(c *gin.Context) {
 
@@ -73,7 +82,7 @@ func VerifyJWT()func(c *gin.Context){
 		if !(len(JwtInformation) == 2 && JwtInformation[0] == "Bearer") {
 			c.JSON(http.StatusOK,gin.H{
 				"code" : 2004,
-				"message" : "Authorazition格式错误",
+				"message" : "Authorization格式错误",
 			})
 			c.Abort()
 			return

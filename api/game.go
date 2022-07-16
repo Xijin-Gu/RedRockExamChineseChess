@@ -1,3 +1,9 @@
+/**
+* @Author: gxj
+* @Data: 2022/7/17-3:13
+* @DESC: upgrade
+**/
+
 package api
 
 import (
@@ -10,17 +16,17 @@ import (
 	"time"
 )
 
-var upgrader = websocket.Upgrader{
+var upgrade = websocket.Upgrader{
 	// 这个是校验请求来源,直接return true
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
 }
 
-
+//ChessGame 将协议升级为websocket
 func ChessGame(c *gin.Context){
 	//升级协议
-	client, _ := upgrader.Upgrade(c.Writer, c.Request, nil)
+	client, _ := upgrade.Upgrade(c.Writer, c.Request, nil)
 	//进入循环
 	for {
 		//读取用户信息
@@ -41,7 +47,7 @@ func ChessGame(c *gin.Context){
 		}
 		//解析棋盘
 		var checkerboard [10][9]string
-		checkerboard = service.ParseCheckboard(gameData.Checkerboard)
+		checkerboard = service.ParseCheckerboard(gameData.Checkerboard)
 		//走棋后
 
 		gameUpdate := service.MoveChess(start,end,checkerboard,gameData)

@@ -1,3 +1,9 @@
+/**
+* @Author: gxj
+* @Data: 2022/7/17-3:15
+* @DESC: Defines the middleware under the house path,定义了房间路径下的中间件
+**/
+
 package api
 
 import (
@@ -8,7 +14,7 @@ import (
 	"strconv"
 )
 
-//创建房间
+//CreateHouse 创建房间
 func CreateHouse(c *gin.Context){
 	//验证token
 	name := c.MustGet("name").(string)
@@ -70,7 +76,7 @@ func JoinHouse(c *gin.Context){
 
 	//录入状态信息
 	state := c.Query("state")
-	if (state == "0" || state == "1") {
+	if state == "0" || state == "1" {
 		err := service.SaveState(state,bo,houseID)
 		if err != nil {
 			c.JSON(http.StatusOK,gin.H{

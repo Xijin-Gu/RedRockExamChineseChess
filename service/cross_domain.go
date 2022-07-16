@@ -1,3 +1,10 @@
+/**
+* @Author: gxj
+* @Data: 2022/7/17-3:08
+* @DESC: cross domain file,跨域文件
+**/
+
+
 package service
 
 import (
@@ -5,6 +12,7 @@ import (
 	"net/http"
 )
 
+//CrossDomain 支持跨域
 func CrossDomain() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		method := c.Request.Method

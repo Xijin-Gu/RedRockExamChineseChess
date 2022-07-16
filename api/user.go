@@ -1,3 +1,9 @@
+/**
+* @Author: gxj
+* @Data: 2022/7/17-3:15
+* @DESC: Defines the middleware under the user path,定义了用户路径下的中间件
+**/
+
 package api
 
 import (
@@ -11,6 +17,7 @@ import (
 	"time"
 )
 
+//SendActivationCode 发送邮箱验证码
 func SendActivationCode(c *gin.Context){
 	//获取用户发送信息
 	//绑定参数并处理错误
@@ -25,7 +32,7 @@ func SendActivationCode(c *gin.Context){
 	}
 	//判断参数是否合法
 	//判断账号密码是否合法,不为空就行...好吧，密码要大于等于六位，用户名不能大于15位且用户名不能重复
-	if (u.Name == "" || u.Password == "") {
+	if u.Name == "" || u.Password == "" {
 		c.JSON(http.StatusOK,gin.H{
 			"message":"亲，用户名或密码不能为空哦",
 		})
@@ -82,7 +89,7 @@ func SendActivationCode(c *gin.Context){
 	})
 }
 
-
+//VerifyActivationCode 验证邮箱验证码是否正确
 func VerifyActivationCode(c *gin.Context){
 	//获取用户发送信息
 	var u model.User
@@ -98,7 +105,7 @@ func VerifyActivationCode(c *gin.Context){
 	um := service.ObtainCode(u.Name)
 	code := um.ActivationCode
 	//如果激活码不存在或失效，返回信息
-	if (code == "" || (um.CreateTime.UnixNano()-time.Now().UnixNano())<0) {
+	if code == "" || (um.CreateTime.UnixNano()-time.Now().UnixNano())<0 {
 		c.JSON(http.StatusOK,gin.H{
 			"message":"邮箱激活码不存在或失效，请获取激活码",
 		})
@@ -141,7 +148,7 @@ func VerifyActivationCode(c *gin.Context){
 
 }
 
-
+//Login 用户登录
 func Login(c *gin.Context){
 	//读取用户参数
 	var u model.User
@@ -153,7 +160,7 @@ func Login(c *gin.Context){
 	}
 	//判断参数是否合法，用户名最长15位，不为空，密码长于6位
 	//判断账号密码是否合法,不为空就行...好吧，密码要大于等于六位，用户名不能大于15位且用户名不能重复
-	if (u.Name == "" || u.Password == "") {
+	if u.Name == "" || u.Password == "" {
 		c.JSON(http.StatusOK,gin.H{
 			"message":"亲，用户名或密码不能为空哦",
 		})
@@ -198,12 +205,12 @@ func Login(c *gin.Context){
 	//在后台打印日志
 	fmt.Println(um.Name,"登录成功")
 	//返回token
-	tokenstring,_ := service.GenerateToken(um.Name)
+	TokenString, _ := service.GenerateToken(um.Name)
 	c.JSON(http.StatusOK,gin.H{
 		"code" : 2000,
 		"message" : "欢迎回来，"+um.Name,
 		"data" : gin.H{
-			"token" : tokenstring,
+			"token" : TokenString,
 		},
 	})
 }

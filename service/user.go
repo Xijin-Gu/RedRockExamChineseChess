@@ -1,3 +1,9 @@
+/**
+* @Author: gxj
+* @Data: 2022/7/17-3:16
+* @DESC: Contains user-related business logic,包含了用户相关的业务逻辑
+**/
+
 package service
 
 import (
@@ -15,7 +21,7 @@ import (
 	"time"
 )
 
-//判断邮箱格式
+//JudgeEmail 判断邮箱格式
 func JudgeEmail(email string)bool{
 	//邮箱格式的正则表达式，由CSDN搜索得到
 	pattern := `^[0-9a-z][_.0-9a-z-]{0,31}@([0-9a-z][0-9a-z-]{0,30}[0-9a-z]\.){1,4}[a-z]{2,4}$`
@@ -25,7 +31,7 @@ func JudgeEmail(email string)bool{
 	return reg.MatchString(email)
 }
 
-//判断用户名是否存在
+//JudgeUsername 判断用户名是否存在
 func JudgeUsername(name string)bool{
 	//连接数据库
 	db := dao.Link()
