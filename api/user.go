@@ -101,7 +101,7 @@ func SendActivationCode(c *gin.Context){
 func VerifyActivationCode(c *gin.Context){
 	//获取用户发送信息
 	var u model.User
-	err := c.ShouldBind(&u)
+	err := c.ShouldBindJSON(&u)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusOK,gin.H{
@@ -160,7 +160,7 @@ func VerifyActivationCode(c *gin.Context){
 func Login(c *gin.Context){
 	//读取用户参数
 	var u model.User
-	err := c.ShouldBind(&u)
+	err := c.ShouldBindJSON(&u)
 	if err != nil {
 		c.JSON(http.StatusOK,gin.H{
 			"message":"出现错误，请联系管理员",
