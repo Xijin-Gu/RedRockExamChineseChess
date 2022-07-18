@@ -17,12 +17,19 @@ import (
 	"time"
 )
 
+func Router(Handler func (c *gin.Context)) *gin.Engine{
+	router := gin.Default()
+	router.POST("/test", Handler)
+	return router
+}
+
+
 //SendActivationCode 发送邮箱验证码
 func SendActivationCode(c *gin.Context){
 	//获取用户发送信息
 	//绑定参数并处理错误
 	var u model.User
-	err := c.ShouldBind(&u)
+	err := c.ShouldBindJSON(&u)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusOK,gin.H{
@@ -88,6 +95,7 @@ func SendActivationCode(c *gin.Context){
 		"message":"请尽快激活账号",
 	})
 }
+
 
 //VerifyActivationCode 验证邮箱验证码是否正确
 func VerifyActivationCode(c *gin.Context){

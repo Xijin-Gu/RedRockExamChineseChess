@@ -13,10 +13,10 @@ import (
 
 
 type User struct {
-	ID int `gorm:"primary_key"`	//用户ID
-	Name string `gorm:"unique"`	//用户名
-	Password string				//用户密码，加盐后存储
-	Email string				//用户邮箱
+	ID int `gorm:"primary_key" json:"id"`	//用户ID
+	Name string `gorm:"unique" json:"name"`	//用户名
+	Password string			`json:"password"`	//用户密码，加盐后存储
+	Email string				`json:"email"`//用户邮箱
 	ActivationCode string		//用户验证码，激活后为0
 	CreateTime time.Time		//创建时间
 	Salt string					//用户密码的盐值
